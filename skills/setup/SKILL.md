@@ -177,10 +177,42 @@ After extracting initial signals and before finalizing dimensions, ask about Obs
 
 **"Do you use Obsidian for viewing or working with notes?"**
 
-- **Yes** -- Set `obsidian: true`. Generate `.obsidian/` config during Step 15b, enable graph view with three-space color coding, add Obsidian-friendly frontmatter fields (aliases, tags, cssclasses) to templates.
+- **Yes** -- Proceed to vault selection (see below)
 - **No** (default) -- Set `obsidian: false`. Standard arscontexta vault, works in any markdown viewer. No `.obsidian/` directory generated.
 
-This is a simple yes/no, not a dimension. Record the answer for Step 15 (vault marker) and Step 15b (Obsidian config generation).
+**If user says Yes — Vault Discovery and Selection:**
+
+Run `${CLAUDE_PLUGIN_ROOT}/hooks/scripts/obsidian-vaults.sh list` to discover registered Obsidian vaults. This reads `~/.config/obsidian/obsidian.json` (Linux) or `~/Library/Application Support/obsidian/obsidian.json` (macOS).
+
+If vaults are found, present the list:
+
+```
+Found N Obsidian vaults:
+
+  1. medit          /home/user/Documents/Obsidian/medit
+  2. Personal       /home/user/Documents/Obsidian/Personal
+  3. MRT            /home/user/Documents/Obsidian/MRT
+
+  N. Create a new vault (generate here and register with Obsidian)
+
+Which vault should arscontexta use?
+```
+
+**If user selects an existing vault:**
+- Set `obsidian: true` and `obsidian_vault_name: {vault_name}` in `.arscontexta`
+- The vault name (directory basename) is used for `obsidian://open?vault={name}` URIs
+- Generate arscontexta structure INTO that vault's path (or into the current directory if different — warn user about path mismatch)
+
+**If user selects "Create new":**
+- Set `obsidian: true` and `obsidian_vault_name: {current_dir_basename}` in `.arscontexta`
+- After Step 15b generates `.obsidian/`, run `${CLAUDE_PLUGIN_ROOT}/hooks/scripts/obsidian-vaults.sh register "$(pwd)"` to register with Obsidian
+- The vault is immediately openable via `obsidian://open?vault={name}` without manual registration
+
+**If no vaults found (Obsidian not installed or no vaults yet):**
+- Set `obsidian: true` and `obsidian_vault_name: {current_dir_basename}` in `.arscontexta`
+- After Step 15b, attempt registration. If `obsidian.json` not found, output: "Install Obsidian and open this folder as a vault, or re-run setup to auto-register."
+
+Record the vault name for Step 15 (vault marker), Step 15b (Obsidian config generation), and Phase 6 (URI output).
 
 ### Signal Extraction
 
@@ -1541,12 +1573,20 @@ session_capture: true
 obsidian: false
 ```
 
-When user selected Obsidian integration in Phase 2, set `obsidian: true` instead of `false`.
+When user selected Obsidian integration in Phase 2, set `obsidian: true` and add `obsidian_vault_name`:
+
+```yaml
+git: true
+session_capture: true
+obsidian: true
+obsidian_vault_name: {vault_name}
+```
 
 Keys and defaults:
 - `git: true` — auto-commit on writes (auto-commit.sh)
 - `session_capture: true` — session JSON capture on start (session-orient.sh)
 - `obsidian: false` — Obsidian integration (`.obsidian/` config, enhanced frontmatter)
+- `obsidian_vault_name:` — Obsidian vault name for URI generation (omitted when obsidian is false)
 
 Omitted keys default to `true` (except `obsidian` which defaults to `false` — opt-in only), so a minimal marker file (or even an empty file) preserves full default behaviour.
 
@@ -1740,12 +1780,13 @@ Include these based on system state:
 - If `obsidian: true`: include Obsidian-specific output:
   ```
   Obsidian Integration:
-    Open in Obsidian: obsidian://open?path={absolute_vault_path}
+    Vault: {obsidian_vault_name}
+    Open in Obsidian: obsidian://open?vault={obsidian_vault_name}
     Graph view configured with three-space color coding
     Recommended plugins: Dataview, Graph Analysis, Omnisearch
     See platforms/obsidian/README.md for full integration guide
   ```
-  The URI uses `path=` (absolute filesystem path), NOT `vault=` (which requires a vault name).
+  The URI uses `vault=` (registered vault name from `.arscontexta` config). If vault name contains spaces, URL-encode them.
 
 ---
 

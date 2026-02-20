@@ -466,11 +466,21 @@ Open the Obsidian graph view with space-aware filtering. Since Claude Code canno
 
 **Prerequisites:** `obsidian: true` in `.arscontexta`. If not enabled, output: "Obsidian integration not enabled. Set `obsidian: true` in `.arscontexta` or re-run `/arscontexta:setup` with Obsidian option."
 
-**Step 1: Determine vault path and preset**
+**Step 1: Determine vault name and preset**
 
 ```bash
+# Read vault name from config (set during /setup)
+SCRIPT_DIR="${CLAUDE_PLUGIN_ROOT}/hooks/scripts"
+VAULT_NAME="$(bash "$SCRIPT_DIR/read_config.sh" "obsidian_vault_name" "")"
 VAULT_PATH="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 PRESET="${1:-full}"  # default to full if no preset specified
+
+# Build URI: prefer vault= (registered name), fall back to path=
+if [ -n "$VAULT_NAME" ]; then
+  URI="obsidian://open?vault=$(echo "$VAULT_NAME" | sed 's/ /%20/g')"
+else
+  URI="obsidian://open?path=${VAULT_PATH}"
+fi
 ```
 
 **Step 2: Output URI and graph context**
@@ -478,7 +488,8 @@ PRESET="${1:-full}"  # default to full if no preset specified
 ```
 --=={ graph > obsidian ({preset}) }==--
 
-  Open in Obsidian: obsidian://open?path={VAULT_PATH}
+  Vault: {VAULT_NAME} ({VAULT_PATH})
+  Open in Obsidian: {URI}
 
   Graph Presets (use Bookmarks pane to switch):
 
@@ -499,7 +510,7 @@ PRESET="${1:-full}"  # default to full if no preset specified
     - Graph bookmarks are pre-configured — check the Bookmarks pane
 ```
 
-**URI format:** Always use `obsidian://open?path={absolute_path}` (NOT `vault=` which requires a vault name).
+**URI format:** Prefer `obsidian://open?vault={name}` when `obsidian_vault_name` is set in `.arscontexta` (registered vault). Fall back to `obsidian://open?path={absolute_path}` if vault name is not available.
 
 ---
 

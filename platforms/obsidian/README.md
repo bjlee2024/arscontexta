@@ -20,13 +20,13 @@ During `/arscontexta:setup`, select "Yes" when asked about Obsidian integration.
 
 ## Opening Your Vault in Obsidian
 
-After setup, open the vault directory in Obsidian:
+During `/arscontexta:setup`, you'll choose an existing Obsidian vault or create a new one. The vault is automatically registered with Obsidian, so you can open it directly:
 
 ```
-obsidian://open?path=/absolute/path/to/your/vault
+obsidian://open?vault=YourVaultName
 ```
 
-Or use File > Open Vault > Open folder as vault in Obsidian.
+The vault name is stored in `.arscontexta` as `obsidian_vault_name` and used for all URI generation. If you need to change it, edit `.arscontexta` directly or re-run setup.
 
 ## Graph View
 

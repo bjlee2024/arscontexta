@@ -77,14 +77,21 @@ Config templates use these markers, resolved during `/setup`:
 
 ## Obsidian URI Scheme
 
-All URIs use `obsidian://open?path={absolute_path}` (NOT `vault=` parameter):
+Prefer `vault=` (registered vault name) when `obsidian_vault_name` is set in `.arscontexta`:
 
 ```
-obsidian://open?path=/absolute/path/to/vault          # Open vault
-obsidian://open?path=/absolute/path/to/vault/note.md   # Open specific note
+obsidian://open?vault=MyVault                          # Open vault by name (preferred)
+obsidian://open?vault=MyVault&file=note-title           # Open specific note
 ```
 
-The `path` parameter auto-resolves to the correct Obsidian vault.
+Fall back to `path=` when vault name is not available:
+
+```
+obsidian://open?path=/absolute/path/to/vault           # Open vault by path (fallback)
+obsidian://open?path=/absolute/path/to/vault/note.md   # Open specific note by path
+```
+
+The vault name is stored in `.arscontexta` as `obsidian_vault_name` during `/setup`.
 
 ## Target Obsidian Version
 
