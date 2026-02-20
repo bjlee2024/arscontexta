@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "type": "search",
+      "query": "path:{DOMAIN:notes}",
+      "title": "Knowledge Graph -- {DOMAIN:notes} space only"
+    },
+    {
+      "type": "search",
+      "query": "",
+      "title": "Full System -- all spaces with color coding"
+    },
+    {
+      "type": "search",
+      "query": "-path:{DOMAIN:ops}/sessions -path:{DOMAIN:ops}/queue",
+      "title": "Orphan Hunt -- find disconnected notes"
+    },
+    {
+      "type": "search",
+      "query": "tag:#moc OR path:{DOMAIN:notes}/index",
+      "title": "MOC Network -- maps of content only"
+    }
+  ]
+}

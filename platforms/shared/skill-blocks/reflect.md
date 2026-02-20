@@ -377,6 +377,12 @@ relevant_notes:
 
 Context phrases use standard relationship vocabulary: extends, grounds, contradicts, exemplifies, synthesizes, enables.
 
+**Preserving Obsidian Frontmatter:**
+
+{if config.obsidian}
+When editing existing {vocabulary.note_plural} to add connections, preserve all Obsidian frontmatter fields (`aliases`, `tags`, `cssclasses`). If you add a new topic to the Topics footer, also update the `tags` array by slugifying the new MOC name (e.g., `[[New Topic MOC]]` adds `new-topic` to tags).
+{endif}
+
 **Bidirectional Consideration:**
 
 When adding [[A]] to [[B]], ask: should [[B]] also link to [[A]]?

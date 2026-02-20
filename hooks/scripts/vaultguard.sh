@@ -19,6 +19,7 @@ if [ -f "$MARKER" ]; then
 
 git: true
 session_capture: true
+obsidian: false
 EOF
   fi
   exit 0
@@ -33,6 +34,7 @@ if [ -f ops/config.yaml ] || [ -f .claude/hooks/session-orient.sh ]; then
 
 git: true
 session_capture: true
+obsidian: false
 EOF
   exit 0
 fi

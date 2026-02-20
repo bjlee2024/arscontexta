@@ -460,6 +460,49 @@ For each linking {vocabulary.note}:
   Entry points (no incoming links): [[note X]], [[note Y]]
 ```
 
+### /graph obsidian [preset]
+
+Open the Obsidian graph view with space-aware filtering. Since Claude Code cannot launch GUI applications directly, this outputs the `obsidian://` URI for the user to click or open.
+
+**Prerequisites:** `obsidian: true` in `.arscontexta`. If not enabled, output: "Obsidian integration not enabled. Set `obsidian: true` in `.arscontexta` or re-run `/arscontexta:setup` with Obsidian option."
+
+**Step 1: Determine vault path and preset**
+
+```bash
+VAULT_PATH="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+PRESET="${1:-full}"  # default to full if no preset specified
+```
+
+**Step 2: Output URI and graph context**
+
+```
+--=={ graph > obsidian ({preset}) }==--
+
+  Open in Obsidian: obsidian://open?path={VAULT_PATH}
+
+  Graph Presets (use Bookmarks pane to switch):
+
+    Knowledge Graph  -- {vocabulary.notes} space only (primary view)
+    Full System      -- all spaces with color coding
+    Orphan Hunt      -- find disconnected {vocabulary.note_plural}
+    MOC Network      -- {vocabulary.topic_map}-to-{vocabulary.topic_map} connections
+
+  Three-Space Colors:
+    Blue   -- self/ (agent mind)
+    Green  -- {vocabulary.notes}/ (knowledge graph)
+    Amber  -- ops/ (operational)
+    Red    -- {vocabulary.inbox}/ (processing queue)
+
+  Actions:
+    - Click the URI above to open the vault in Obsidian
+    - Use Ctrl/Cmd+G for global graph, Ctrl/Cmd+Shift+G for local graph
+    - Graph bookmarks are pre-configured — check the Bookmarks pane
+```
+
+**URI format:** Always use `obsidian://open?path={absolute_path}` (NOT `vault=` which requires a vault name).
+
+---
+
 ### /graph query [field] [value]
 
 Schema-level YAML query across {vocabulary.note_plural}.
@@ -522,6 +565,8 @@ If no arguments provided:
 | "Where does [[X]] lead?" | forward [[X]] | Forward traversal |
 | "Show me notes about [topic]" | query topics [[topic]] | Schema query |
 | "What needs connecting in [topic]?" | siblings [[topic]] | Unconnected sibling pairs |
+| "Open in Obsidian" | obsidian | Obsidian graph view URI |
+| "Show me the graph visually" | obsidian full | Obsidian full graph view |
 
 3. Run the mapped operation
 4. After presenting results, offer follow-up: "Want to explore any of these further?"

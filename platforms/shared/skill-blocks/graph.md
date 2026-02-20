@@ -65,6 +65,7 @@ The derivation engine reads the full `skill-sources/graph/SKILL.md` and applies 
 | `forward` | `n-hop-forward.sh` | N-hop forward traversal from a specific {vocabulary.note} |
 | `backward` | `recursive-backlinks.sh` | N-hop backward traversal to a specific {vocabulary.note} |
 | `query` | Combined | Natural language graph question (routed to appropriate operation) |
+| `obsidian` | N/A (URI output) | Open Obsidian graph view with space-aware presets (if obsidian: true) |
 
 ### Operation Output Pattern (Invariant)
 
