@@ -496,12 +496,22 @@ Bad: "context management strategies" (topic label, not a claim)
 
 **b. Write the {vocabulary.note}**
 
+{if config.obsidian}
+**Obsidian-enhanced frontmatter:** When the vault has `obsidian: true` in `.arscontexta`, add these fields after the standard fields:
+- `aliases`: alternative names/phrases for this {vocabulary.note} (array of strings, derived from title keywords and description)
+- `tags`: derived from topics by slugifying MOC names — e.g., `["[[Cognitive Science MOC]]"]` becomes `[cognitive-science]` (array of strings, lowercase, hyphens)
+- `cssclasses`: note-type CSS class — `[arscontexta-{type}]` where `{type}` is the note's type field (e.g., `arscontexta-claim`, `arscontexta-methodology`)
+{endif}
+
 ```markdown
 ---
 description: [~150 chars elaborating the claim, adds info beyond title]
 type: [claim | methodology | problem | learning | tension]
 created: YYYY-MM-DD
 [domain-specific fields from derivation-manifest]
+{if config.obsidian}aliases: [alternative names derived from title/description]
+tags: [slugified topic MOC names]
+cssclasses: [arscontexta-{type}]{endif}
 ---
 
 # [prose-as-title proposition]

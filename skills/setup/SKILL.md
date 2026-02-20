@@ -171,6 +171,17 @@ The conversation focuses on understanding the user's domain and needs. Users adj
 
 **If running in --advanced mode:** After the opening conversation, present the 8 dimensions with recommended positions based on extracted signals. Allow the user to adjust each dimension. Then proceed with the adjusted configuration.
 
+### Platform Integration (Optional)
+
+After extracting initial signals and before finalizing dimensions, ask about Obsidian:
+
+**"Do you use Obsidian for viewing or working with notes?"**
+
+- **Yes** -- Set `obsidian: true`. Generate `.obsidian/` config during Step 15b, enable graph view with three-space color coding, add Obsidian-friendly frontmatter fields (aliases, tags, cssclasses) to templates.
+- **No** (default) -- Set `obsidian: false`. Standard arscontexta vault, works in any markdown viewer. No `.obsidian/` directory generated.
+
+This is a simple yes/no, not a dimension. Record the answer for Step 15 (vault marker) and Step 15b (Obsidian config generation).
+
 ### Signal Extraction
 
 As the user talks, passively extract signals for dimensions. Do not ask about dimensions directly. Listen for them in natural conversation. Record each signal with its confidence level.
@@ -656,6 +667,7 @@ Step 4: Compose in canonical block order:
   15. ethical-guardrails -- Behavioral constraints
   16. helper-functions -- Utility scripts (always included)
   17. graph-analysis -- Graph intelligence and query patterns (always included)
+  18. obsidian-integration -- Obsidian graph view, URI scheme, frontmatter guidance (if obsidian: true)
 
 Step 5: Cross-reference elimination.
   If a block is excluded, scan remaining blocks for references to excluded concepts and remove or rephrase:
@@ -1526,13 +1538,53 @@ Create `.arscontexta` in the vault root. This marker file identifies the directo
 
 git: true
 session_capture: true
+obsidian: false
 ```
+
+When user selected Obsidian integration in Phase 2, set `obsidian: true` instead of `false`.
 
 Keys and defaults:
 - `git: true` — auto-commit on writes (auto-commit.sh)
 - `session_capture: true` — session JSON capture on start (session-orient.sh)
+- `obsidian: false` — Obsidian integration (`.obsidian/` config, enhanced frontmatter)
 
-Omitted keys default to `true`, so a minimal marker file (or even an empty file) preserves full default behaviour.
+Omitted keys default to `true` (except `obsidian` which defaults to `false` — opt-in only), so a minimal marker file (or even an empty file) preserves full default behaviour.
+
+---
+
+#### Step 15b: Obsidian Configuration (conditional)
+
+**Only when user selected Obsidian integration in Phase 2 (`obsidian: true`).**
+
+Generate `.obsidian/` directory from templates in `${CLAUDE_PLUGIN_ROOT}/platforms/obsidian/configs/`:
+
+1. Create `.obsidian/` directory in vault root
+2. Read each template file from `${CLAUDE_PLUGIN_ROOT}/platforms/obsidian/configs/`
+3. Resolve `{DOMAIN:notes}`, `{DOMAIN:self}`, `{DOMAIN:ops}`, `{DOMAIN:inbox}` markers using vocabulary from `ops/derivation.md`
+4. Write resolved configs:
+   - `.obsidian/app.json` -- Obsidian app settings (new files go to notes folder)
+   - `.obsidian/appearance.json` -- Theme settings
+   - `.obsidian/graph.json` -- Global graph view with three-space color coding (self=blue, notes=green, ops=amber, inbox=red)
+   - `.obsidian/community-plugins.json` -- Empty array (user installs manually)
+   - `.obsidian/bookmarks.json` -- 4 saved graph filter presets (knowledge, full, orphans, MOCs)
+   - `.obsidian/hotkeys.json` -- Empty (user customizes)
+   - `.obsidian/workspace.json` -- Default workspace layout (will be gitignored)
+5. Add gitignore entries for volatile Obsidian files:
+   ```
+   # Obsidian -- volatile files
+   .obsidian/workspace.json
+   .obsidian/workspace-mobile.json
+   .obsidian/cache
+   ```
+   Append to existing `.gitignore` or create one.
+
+**Graph color coding maps the three-space architecture to visual colors:**
+- `path:self` -- Blue (agent mind, slow growth)
+- `path:{DOMAIN:notes}` -- Green (knowledge graph, the star of graph view)
+- `path:ops` -- Amber (operational, usually filtered out)
+- `path:{DOMAIN:inbox}` -- Red (processing queue, temporary)
+
+**Arrows enabled** (`showArrow: true`) because wiki links are directional.
 
 ---
 
@@ -1685,6 +1737,15 @@ Include these based on system state:
 - If qmd not installed and semantic-search is active: npm/bun install instructions + qmd init/update/embed + `.mcp.json` contract
 - If personality not enabled: mention `/arscontexta:architect` for future voice tuning once the vault has 50+ notes
 - If any kernel checks failed: specific remediation instructions
+- If `obsidian: true`: include Obsidian-specific output:
+  ```
+  Obsidian Integration:
+    Open in Obsidian: obsidian://open?path={absolute_vault_path}
+    Graph view configured with three-space color coding
+    Recommended plugins: Dataview, Graph Analysis, Omnisearch
+    See platforms/obsidian/README.md for full integration guide
+  ```
+  The URI uses `path=` (absolute filesystem path), NOT `vault=` (which requires a vault name).
 
 ---
 

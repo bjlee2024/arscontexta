@@ -39,6 +39,21 @@ case "$FILE" in
     if ! head -1 "$FILE" | grep -q "^---$"; then
       WARNS="${WARNS}Missing YAML frontmatter. "
     fi
+    # Obsidian-specific field warnings (advisory only)
+    READ_CONFIG="$GUARD_DIR/read_config.sh"
+    if [ "$(bash "$READ_CONFIG" "obsidian" "false")" = "true" ]; then
+      OBS_WARNS=""
+      if ! head -20 "$FILE" | grep -q "^aliases:"; then
+        OBS_WARNS="${OBS_WARNS}Missing aliases field (Obsidian search). "
+      fi
+      if head -20 "$FILE" | grep -q "^type:" && ! head -20 "$FILE" | grep -q "^cssclasses:"; then
+        OBS_WARNS="${OBS_WARNS}Missing cssclasses field (Obsidian styling). "
+      fi
+      if [ -n "$OBS_WARNS" ]; then
+        WARNS="${WARNS}[Obsidian] ${OBS_WARNS}"
+      fi
+    fi
+
     if [ -n "$WARNS" ]; then
       FILENAME=$(basename "$FILE" .md)
       echo "{\"additionalContext\": \"Schema warnings for $FILENAME: $WARNS\"}"

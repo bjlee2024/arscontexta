@@ -2,6 +2,10 @@
 description: One sentence adding context beyond the title (~150 chars, no period)
 type: insight | pattern | preference | fact | decision | question
 created: YYYY-MM-DD
+# Obsidian fields (only when obsidian: true in .arscontexta)
+# aliases: []      -- alternative names for search and linking
+# tags: []         -- derived from topics (slugified MOC names)
+# cssclasses: []   -- note-type CSS class, e.g. [arscontexta-insight]
 ---
 
 # prose-as-title expressing the insight as a complete proposition

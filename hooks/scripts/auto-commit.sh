@@ -25,7 +25,7 @@ if ! git rev-parse --is-inside-work-tree &>/dev/null; then
   exit 0
 fi
 
-# Stage all changes
+# Stage all changes (respects .gitignore — git add -A skips gitignored files)
 git add -A 2>/dev/null || exit 0
 
 # Check if there are staged changes
