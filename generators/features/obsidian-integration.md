@@ -8,11 +8,16 @@ This vault is configured as an Obsidian vault. The `.obsidian/` directory contai
 
 ### Opening the Vault
 
+The vault is registered with Obsidian as `{obsidian_vault_name}` (from `.arscontexta` config).
+
+```
+obsidian://open?vault={obsidian_vault_name}
+```
+
+If `obsidian_vault_name` is not set, fall back to path-based URI:
 ```
 obsidian://open?path={vault_absolute_path}
 ```
-
-Use `path=` (absolute filesystem path). Do NOT use `vault=` (which requires the Obsidian vault name).
 
 ### Graph View
 
